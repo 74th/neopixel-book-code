@@ -1,0 +1,10 @@
+.program blinkdma
+
+.wrap_target
+    pull ifempty
+loop:
+    set pins, 1 [9]
+    out pins, 1 [9]
+    set pins, 0 [20]
+    jmp !osre loop
+.wrap
