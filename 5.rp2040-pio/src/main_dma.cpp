@@ -6,7 +6,8 @@
 #include "hardware/clocks.h"
 #include "hardware/dma.h"
 
-#define BUF_SIZE 6 * 3
+#define LED_NUM 6
+#define DATA_SIZE 6 * 3
 
 void main2()
 {
@@ -16,7 +17,7 @@ void main2()
     PIO pio;
     int sm;
 
-    char buf[BUF_SIZE];
+    int8_t data[DATA_SIZE];
     int dma_chan;
     dma_channel_config dma_chan_config;
 
@@ -73,58 +74,57 @@ void main2()
         (uint)dma_chan,
         &dma_chan_config,
         &pio0_hw->txf[sm],
-        buf,
-        BUF_SIZE,
+        data,
+        DATA_SIZE,
         false);
 
     // ステートマシンの開始
     pio_sm_set_enabled(pio, sm, true);
 
+    int n = 0;
     while (true)
     {
         Serial.println("loop");
 
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < LED_NUM; i++)
         {
-            for (int j = 0; j < 6; j++)
+            switch ((n + i) % 6)
             {
-                int n = (i + j) % 6;
-                switch (n)
-                {
-                case 0:
-                    buf[3 * j] = 0xf;
-                    buf[3 * j + 1] = 0x0;
-                    buf[3 * j + 2] = 0x0;
-                    break;
-                case 1:
-                    buf[3 * j] = 0x3;
-                    buf[3 * j + 1] = 0x3;
-                    buf[3 * j + 2] = 0x0;
-                    break;
-                case 2:
-                    buf[3 * j] = 0x0;
-                    buf[3 * j + 1] = 0xf;
-                    buf[3 * j + 2] = 0x0;
-                    break;
-                case 3:
-                    buf[3 * j] = 0x0;
-                    buf[3 * j + 1] = 0x3;
-                    buf[3 * j + 2] = 0x3;
-                    break;
-                case 4:
-                    buf[3 * j] = 0x0;
-                    buf[3 * j + 1] = 0x0;
-                    buf[3 * j + 2] = 0xf;
-                    break;
-                case 5:
-                    buf[3 * j] = 0x3;
-                    buf[3 * j + 1] = 0x0;
-                    buf[3 * j + 2] = 0x3;
-                    break;
-                }
+            case 0:
+                data[i * 3] = 0x20;
+                data[i * 3 + 1] = 0x00;
+                data[i * 3 + 2] = 0x00;
+                break;
+            case 1:
+                data[i * 3] = 0x20;
+                data[i * 3 + 1] = 0x20;
+                data[i * 3 + 2] = 0x00;
+                break;
+            case 2:
+                data[i * 3] = 0x00;
+                data[i * 3 + 1] = 0x20;
+                data[i * 3 + 2] = 0x00;
+                break;
+            case 3:
+                data[i * 3] = 0x00;
+                data[i * 3 + 1] = 0x20;
+                data[i * 3 + 2] = 0x20;
+                break;
+            case 4:
+                data[i * 3] = 0x00;
+                data[i * 3 + 1] = 0x00;
+                data[i * 3 + 2] = 0x20;
+                break;
+            case 5:
+                data[i * 3] = 0x20;
+                data[i * 3 + 1] = 0x00;
+                data[i * 3 + 2] = 0x20;
+                break;
             }
-            dma_channel_set_read_addr(dma_chan, buf, true);
-            sleep_ms(200);
         }
+
+        dma_channel_set_read_addr(dma_chan, data, true);
+        sleep_ms(500);
+        n++;
     }
 }
