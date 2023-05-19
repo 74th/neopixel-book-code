@@ -49,8 +49,6 @@ void GPIO_INIT(void)
 
 #define LED_NUM 3
 #define BUFFER_LEN LED_NUM * 3
-uint8_t data[BUFFER_LEN] = {0xff, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0xff};
-// uint16_t data[BUFFER_LEN] = {0b010101010101, 0b010101010101, 0b010101010101, 0b010101010101, 0b010101010101, 0b010101010101};
 uint32_t h = LED_PIN;
 uint32_t l = LED_PIN << 16;
 
@@ -64,20 +62,58 @@ int main(void)
     GPIO_INIT();
 
     Delay_Ms(100);
-    int i = 0;
+    int n = 0;
 
     while (1)
     {
-        Delay_Ms(100);
-        task();
+        Delay_Ms(300);
+        task(n);
+        n++;
     }
 }
 
-void task()
+void task(int n)
 {
     uint32_t h = LED_PIN;
     uint32_t l = LED_PIN << 16;
-    uint8_t data[BUFFER_LEN] = {0xff, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0xff};
+    uint8_t data[BUFFER_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+    for (int i = 0; i < LED_NUM; i++)
+    {
+        switch ((n + i) % 6)
+        {
+        case 0:
+            data[i * 3] = 0x20;
+            data[i * 3 + 1] = 0x00;
+            data[i * 3 + 2] = 0x00;
+            break;
+        case 1:
+            data[i * 3] = 0x20;
+            data[i * 3 + 1] = 0x20;
+            data[i * 3 + 2] = 0x00;
+            break;
+        case 2:
+            data[i * 3] = 0x00;
+            data[i * 3 + 1] = 0x20;
+            data[i * 3 + 2] = 0x00;
+            break;
+        case 3:
+            data[i * 3] = 0x00;
+            data[i * 3 + 1] = 0x20;
+            data[i * 3 + 2] = 0x20;
+            break;
+        case 4:
+            data[i * 3] = 0x00;
+            data[i * 3 + 1] = 0x00;
+            data[i * 3 + 2] = 0x20;
+            break;
+        case 5:
+            data[i * 3] = 0x20;
+            data[i * 3 + 1] = 0x00;
+            data[i * 3 + 2] = 0x20;
+            break;
+        }
+    }
 
     for (int i = 0; i < BUFFER_LEN; i++)
     {
@@ -87,16 +123,45 @@ void task()
             if (c & 0x1)
             {
                 GPIOD->BSHR = h;
-                asm("c.nop 7");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 16");
                 GPIOD->BSHR = l;
             }
             else
             {
                 GPIOD->BSHR = h;
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
                 GPIOD->BSHR = l;
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
+                asm("c.nop 31");
             }
             c = c >> 1;
-            asm("c.nop 7");
         }
     }
 }
