@@ -48,7 +48,7 @@ void GPIO_INIT(void)
 }
 
 #define LED_NUM 3
-#define BUFFER_LEN LED_NUM * 3
+#define DATA_SIZE LED_NUM * 3
 uint32_t h = LED_PIN;
 uint32_t l = LED_PIN << 16;
 
@@ -76,7 +76,7 @@ void task(int n)
 {
     uint32_t h = LED_PIN;
     uint32_t l = LED_PIN << 16;
-    uint8_t data[BUFFER_LEN] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    uint8_t data[DATA_SIZE];
 
     for (int i = 0; i < LED_NUM; i++)
     {
@@ -115,7 +115,7 @@ void task(int n)
         }
     }
 
-    for (int i = 0; i < BUFFER_LEN; i++)
+    for (int i = 0; i < DATA_SIZE; i++)
     {
         uint16_t c = data[i];
         for (int j = 0; j < 8; j++)
